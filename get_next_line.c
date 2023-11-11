@@ -6,11 +6,21 @@
 /*   By: sdell-er <sdell-er@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:55:42 by sdell-er          #+#    #+#             */
-/*   Updated: 2023/11/07 17:40:49 by sdell-er         ###   ########.fr       */
+/*   Updated: 2023/11/11 17:40:18 by sdell-er         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+
+int	ft_strlen(char const *s)
+{
+	int	l;
+
+	l = 0;
+	while (s[l])
+		l++;
+	return (l);
+}
 
 char	*ft_strchr(const char *s, int c)
 {
@@ -25,27 +35,32 @@ char	*ft_strchr(const char *s, int c)
 	return (NULL);
 }
 
-char	*ft_strcat(char *dest, char *src)
+int	ft_strlcat(char *dst, const char *src, int size)
 {
-	int	l;
 	int	i;
+	int	sl;
+	int	dl;
 
+	sl = ft_strlen(src);
+	if (size == 0)
+		return (sl);
+	dl = ft_strlen(dst);
 	i = 0;
-	l = 0;
-	while (dest[l])
-		l++;
-	while (src[i])
+	while (src[i] && dl + i < (size - 1))
 	{
-		dest[l + i] = src[i];
-		i++;
+		dst[i + dl] = src[i];
+		i += 1;
 	}
-	dest[l + i] = '\0';
-	return (dest);
+	if (i < size)
+		dst[dl + i] = '\0';
+	if (dl > size)
+		return (sl + size);
+	return (dl + sl);
 }
 
-void	*ft_memcpy(void *dest, const void *src, size_t n)
+void	*ft_memcpy(void *dest, const void *src, int n)
 {
-	size_t		i;
+	int		i;
 
 	if (!dest && !src)
 		return (NULL);
@@ -60,16 +75,76 @@ void	*ft_memcpy(void *dest, const void *src, size_t n)
 
 char	*get_next_line(int fd)
 {
-	char	*str;
-	static char	*buffer;
+	int			len;
+	char		*buffer;
+	char		*line;
+	char		*temp;
+	static char	*store;
 
-	while (*ft_strchr(buffer, '\n') != '\n');
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	if (store == NULL)
 	{
-		if (read(fd, str, BUFFER_SIZE) <= 0)
+		store = malloc(BUFFER_SIZE + 1);
+		if (!store)
 			return (NULL);
-		ft_strcat(buffer, str);
+		store[0] = '\0';
 	}
-	ft_memcpy(str, buffer, ft_strchr(buffer, '\n') - str + 1);
-	buffer = ft_strchr(buffer, '\n') + 1;
-	return (str);
+	buffer = malloc(BUFFER_SIZE);
+	if (!buffer)
+		return (NULL);
+	len = BUFFER_SIZE;
+	while (len == BUFFER_SIZE && ft_strchr(store, '\n') == NULL)
+	{
+		len = read(fd, buffer, BUFFER_SIZE);
+		if (len <= 0)
+		{
+			free(buffer);
+			return (NULL);
+		}
+		buffer[len] = '\0';
+		temp = malloc(ft_strlen(store) + 1);
+		if (!temp)
+			return (NULL);
+		ft_memcpy(temp, store, ft_strlen(store) + 1);
+		free(store);
+		store = malloc(ft_strlen(store) + len + 1);
+		if (!store)
+			return (NULL);
+		ft_memcpy(store, temp, ft_strlen(temp) + 1);
+		free(temp);
+		ft_strlcat(store, buffer, len);
+	}
+	free(buffer);
+	if (ft_strchr(store, '\n') != NULL)
+	{
+		line = malloc((int)(ft_strchr(store, '\n') - store + 1) + 1);
+		if (!line)
+			return (NULL);
+		ft_memcpy(line, store, (int)(ft_strchr(store, '\n') - store + 1));
+		store = ft_strchr(store, '\n') + 1;
+	}
+	else
+	{
+		line = malloc(ft_strlen(store) + 1);
+		if (!line)
+			return (NULL);
+		ft_memcpy(line, store, ft_strlen(store) + 1);
+		free(store);
+		store = NULL;
+	}
+	return (line);
+}
+#include <fcntl.h>
+#include <stdio.h>
+int main()
+{
+	int fd = open("ciao.txt", O_RDONLY), i = 0;
+	while(i < 10)
+	{
+		printf("%s", get_next_line(fd));
+		i++;
+	}
+	close(fd);
+	return 0;
 }
