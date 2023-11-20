@@ -6,13 +6,13 @@
 /*   By: sdell-er <sdell-er@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:55:42 by sdell-er          #+#    #+#             */
-/*   Updated: 2023/11/15 16:19:07 by sdell-er         ###   ########.fr       */
+/*   Updated: 2023/11/20 12:44:26 by sdell-er         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int	ft_strlen(char const *s)
+int	ft_strlen(char *s)
 {
 	int	l;
 
@@ -24,7 +24,7 @@ int	ft_strlen(char const *s)
 	return (l);
 }
 
-char	*ft_strchr(const char *s, int c)
+char	*ft_strchr(char *s, int c)
 {
 	if (!s)
 		return (NULL);
@@ -47,7 +47,7 @@ char	*ft_strjoin(char **s1, char *s2)
 	new = malloc (sizeof(char) * (ft_strlen(*s1) + ft_strlen(s2) + 1));
 	if (!new)
 	{
-		if (*s1)
+		if (*s1 != NULL)
 			free(*s1);
 		return (NULL);
 	}
@@ -64,12 +64,12 @@ char	*ft_strjoin(char **s1, char *s2)
 		i++;
 	}
 	new[i + ft_strlen(*s1)] = '\0';
-	if (*s1)
+	if (*s1 != NULL)
 		free(*s1);
 	return (new);
 }
 
-void	*ft_memcpy(void *dest, const void *src, int n)
+void	*ft_memcpy(void *dest, void *src, int n)
 {
 	int		i;
 
@@ -103,7 +103,7 @@ char	*ft_calloc(int nmemb, int size)
 	void	*ptr;
 
 	if (!nmemb || !size)
-		return (malloc(1));
+		return (NULL);
 	ptr = malloc(nmemb * size);
 	if (!ptr)
 		return (NULL);
@@ -111,28 +111,47 @@ char	*ft_calloc(int nmemb, int size)
 	return (ptr);
 }
 
+char	*ft_substr(char **s, int start, int len)
+{
+	int		i;
+	int		d;
+	char		*new;
+
+	if (start + len <= ft_strlen(*s))
+		d = len;
+	else if (start >= ft_strlen(*s))
+		d = 0;
+	else
+		d = ft_strlen(*s) - start;
+	new = malloc(sizeof(char) * (d + 1));
+	if (!new)
+	{
+		free(*s);
+		return (NULL);
+	}
+	i = 0;
+	while (d && i < len && (*s)[i])
+	{
+		new[i] = (*s)[start + i];
+		i++;
+	}
+	new[i] = '\0';
+	free(*s);
+	return (new);
+}
+
 char	*get_next_line(int fd)
 {
 	int			len;
-	int			size;
 	int			ctrl;
 	char		*buffer;
-	char		*line;
 	static char	*store = NULL;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
-	{
-		if (store)
-			free(store);
 		return (NULL);
-	}
 	buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
 	if (!buffer)
-	{
-		if (store)
-			free(store);
 		return (NULL);
-	}
 	len = BUFFER_SIZE;
 	ctrl = 0;
 	while (len == BUFFER_SIZE && ft_strchr(store, '\n') == NULL)
@@ -140,8 +159,6 @@ char	*get_next_line(int fd)
 		len = read(fd, buffer, BUFFER_SIZE);
 		if (len < 0 || (len == 0 && !ctrl))
 		{
-			if (store)
-				free(store);
 			free(buffer);
 			return (NULL);
 		}
@@ -155,30 +172,42 @@ char	*get_next_line(int fd)
 	}
 	free(buffer);
 	if (ft_strchr(store, '\n') != NULL)
-		size = (int)(ft_strchr(store, '\n') - store + 1);
+		len = ft_strchr(store, '\n') - store + 1;
 	else
-		size = ft_strlen(store);
-	line = ft_calloc(size + 1, sizeof(char));
-	if (!line)
-	{
-		free(store);
+		len = ft_strlen(store);
+	buffer = ft_calloc(len + 1, sizeof(char));
+	if (!buffer)
 		return (NULL);
+	ft_memcpy(buffer, store, len);
+	if (ft_strchr(store, '\n') != NULL)
+	{
+		store = ft_substr(&store, len, ft_strlen(store) - len + 1);
+		if (!store)
+		{
+			free(buffer);
+			return (NULL);
+		}
 	}
-	ft_memcpy(line, store, size);
-	store = ft_strchr(store, '\n') + 1;
-	return (line);
+	else
+		free(store);
+	return (buffer);
 }
 
-#include <fcntl.h>
-#include <stdio.h>
-int main()
-{
-	int fd = open("ciao.txt", O_RDONLY), i = 0;
-	while(i < 10)
-	{
-		printf("%s", get_next_line(fd));
-		i++;
-	}
-	close(fd);
-	return 0;
-}
+// #include <fcntl.h>
+// #include <stdio.h>
+// int main()
+// {
+// 	int fd = open("ciao.txt", O_RDONLY), i = 0;
+// 	char *s;
+// 	while(i < 10)
+// 	{
+// 		s = get_next_line(fd);
+// 		if(s)
+// 			printf("%s", s);
+// 		i++;
+// 		if (s != NULL)
+// 			free(s);
+// 	}
+// 	close(fd);
+// 	return 0;
+// }
