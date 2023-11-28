@@ -6,12 +6,11 @@
 /*   By: sdell-er <sdell-er@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:55:42 by sdell-er          #+#    #+#             */
-/*   Updated: 2023/11/22 18:15:32 by sdell-er         ###   ########.fr       */
+/*   Updated: 2023/11/23 13:12:00 by sdell-er         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line_bonus.h"
-// #include "get_next_line_utils.c"
 
 void	*ft_memcpy(void *dest, void *src, int n)
 {
@@ -116,9 +115,9 @@ int	set_current_line(char **store, char **buffer)
 char	*get_next_line(int fd)
 {
 	char			*buffer;
-	static char		*store[20000];
+	static char		*store[4096];
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || fd >= 4096)
 		return (NULL);
 	buffer = malloc(BUFFER_SIZE + 1);
 	if (!buffer)
@@ -130,24 +129,3 @@ char	*get_next_line(int fd)
 		return (NULL);
 	return (buffer);
 }
-
-// #include <fcntl.h>
-// #include <stdio.h>
-// int main()
-// {
-// 	int fd = open("big_line_no_nl", O_RDONLY), i = 0;
-// 	char *s;
-// 	while(1)
-// 	{
-// 		s = get_next_line(fd);
-// 		if(s)
-// 			printf("%s", s);
-// 		else
-// 			break;
-// 		i++;
-// 		if (s != NULL)
-// 			free(s);
-// 	}
-// 	close(fd);
-// 	return 0;
-// }

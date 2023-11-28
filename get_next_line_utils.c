@@ -6,7 +6,7 @@
 /*   By: sdell-er <sdell-er@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 16:43:25 by sdell-er          #+#    #+#             */
-/*   Updated: 2023/11/22 18:09:38 by sdell-er         ###   ########.fr       */
+/*   Updated: 2023/11/23 13:01:35 by sdell-er         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,9 +54,13 @@ char	*ft_calloc(int nmemb, int size)
 char	*ft_strjoin(char **s1, char *s2)
 {
 	int			i;
+	int			l2;
+	int			l1;
 	char		*new;
 
-	new = malloc (sizeof(char) * (ft_strlen(*s1) + ft_strlen(s2) + 1));
+	l1 = ft_strlen(*s1);
+	l2 = ft_strlen(s2);
+	new = malloc (sizeof(char) * (l1 + l2 + 1));
 	if (!new)
 	{
 		if (*s1 != NULL)
@@ -64,15 +68,12 @@ char	*ft_strjoin(char **s1, char *s2)
 		return (NULL);
 	}
 	i = -1;
-	while (++i < ft_strlen(*s1))
+	while (++i < l1)
 		new[i] = (*s1)[i];
-	i = 0;
-	while (i < ft_strlen(s2))
-	{
-		new[i + ft_strlen(*s1)] = s2[i];
-		i++;
-	}
-	new[i + ft_strlen(*s1)] = '\0';
+	i = -1;
+	while (++i < l2)
+		new[i + l1] = s2[i];
+	new[i + l1] = '\0';
 	if (*s1 != NULL)
 		free(*s1);
 	return (new);

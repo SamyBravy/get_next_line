@@ -6,12 +6,17 @@
 /*   By: sdell-er <sdell-er@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:55:42 by sdell-er          #+#    #+#             */
-/*   Updated: 2023/11/22 17:56:18 by sdell-er         ###   ########.fr       */
+/*   Updated: 2023/11/23 12:59:34 by sdell-er         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+/*
 #include "get_next_line_utils.c"
+#include <fcntl.h>
+#include <stdio.h>
+#include <time.h>
+*/
 
 void	*ft_memcpy(void *dest, void *src, int n)
 {
@@ -59,7 +64,7 @@ int	fill_store(int fd, char **store, char **buffer, int len)
 {
 	if (ft_strchr(*store, '\n') != NULL)
 		return (1);
-	while (len == BUFFER_SIZE && ft_strchr(*buffer, '\n') != NULL)
+	while (len == BUFFER_SIZE && ft_strchr(*buffer, '\n') == NULL)
 	{
 		ft_bzero(*buffer, BUFFER_SIZE + 1);
 		len = read(fd, *buffer, BUFFER_SIZE);
@@ -79,15 +84,10 @@ int	fill_store(int fd, char **store, char **buffer, int len)
 	return (1);
 }
 
-char	*set_current_line(char **store, char *new_line_index)
+char	*set_current_line(char **store, char *new_line_index, int len)
 {
-	int		len;
 	char	*buffer;
 
-	if (new_line_index != NULL)
-		len = new_line_index - *store + 1;
-	else
-		len = ft_strlen(*store);
 	buffer = ft_calloc(len + 1, sizeof(char));
 	if (!buffer)
 		return (NULL);
@@ -111,6 +111,7 @@ char	*set_current_line(char **store, char *new_line_index)
 
 char	*get_next_line(int fd)
 {
+	char		*new_line_index;
 	char		*buffer;
 	static char	*store = NULL;
 
@@ -125,14 +126,36 @@ char	*get_next_line(int fd)
 		return (NULL);
 	}
 	free(buffer);
-	return (set_current_line(&store, ft_strchr(store, '\n')));
+	new_line_index = ft_strchr(store, '\n');
+	if (new_line_index != NULL)
+		return (set_current_line(&store, new_line_index,
+				new_line_index - store + 1));
+	return (set_current_line(&store, new_line_index, ft_strlen(store)));
 }
-
-#include <fcntl.h>
-#include <stdio.h>
+/*
 int main()
 {
-	int fd = open("ciao.txt", O_RDONLY), i = 0;
+	int fd;
+	char *line;
+	clock_t start, end;
+    double cpu_time_used;
+
+	line = NULL;
+	fd = open("big_line_no_nl", O_RDONLY);
+	start = clock();
+	
+	get_next_line(fd);
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+    printf("Time taken: %f seconds\n", cpu_time_used);
+	close(fd);
+	
+}
+
+int main()
+{
+	int fd = open("big_line_no_nl", O_RDONLY), i = 0;
 	char *s;
 	while(1)
 	{
@@ -148,3 +171,4 @@ int main()
 	close(fd);
 	return 0;
 }
+*/
