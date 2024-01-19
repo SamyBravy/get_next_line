@@ -6,7 +6,7 @@
 /*   By: sdell-er <sdell-er@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:55:42 by sdell-er          #+#    #+#             */
-/*   Updated: 2024/01/18 18:58:22 by sdell-er         ###   ########.fr       */
+/*   Updated: 2024/01/19 18:41:38 by sdell-er         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,5 +127,10 @@ char	*get_next_line(int fd)
 	free(buffer);
 	if (!set_current_line(store + fd, &buffer))
 		return (NULL);
+	if (!**store)
+	{
+		free(*store);
+		*store = NULL;
+	}
 	return (buffer);
 }
