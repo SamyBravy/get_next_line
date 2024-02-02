@@ -6,13 +6,13 @@
 /*   By: sdell-er <sdell-er@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 16:55:42 by sdell-er          #+#    #+#             */
-/*   Updated: 2024/01/19 18:41:38 by sdell-er         ###   ########.fr       */
+/*   Updated: 2024/02/02 17:58:03 by sdell-er         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line_bonus.h"
 
-void	*ft_memcpy(void *dest, void *src, int n)
+void	*ft_memcpy2(void *dest, void *src, int n)
 {
 	int		i;
 
@@ -27,14 +27,14 @@ void	*ft_memcpy(void *dest, void *src, int n)
 	return (dest);
 }
 
-char	*ft_substr(char **s, int start)
+char	*ft_substr2(char **s, int start)
 {
 	int			i;
 	int			d;
 	char		*new;
 
-	if (start < ft_strlen(*s))
-		d = ft_strlen(*s) - start;
+	if (start < ft_strlen2(*s))
+		d = ft_strlen2(*s) - start;
 	else
 		d = 0;
 	new = malloc(sizeof(char) * (d + 1));
@@ -56,11 +56,11 @@ char	*ft_substr(char **s, int start)
 
 int	get_current_line(int fd, char **store, char **buffer, int len)
 {
-	while (len == BUFFER_SIZE && ft_strchr(*store, '\n') == NULL)
+	while (len == BUFFER_SIZE && ft_strchr2(*store, '\n') == NULL)
 	{
-		ft_bzero(*buffer, BUFFER_SIZE + 1);
+		ft_bzero2(*buffer, BUFFER_SIZE + 1);
 		len = read(fd, *buffer, BUFFER_SIZE);
-		if (len < 0 || (len == 0 && !ft_strlen(*store)))
+		if (len < 0 || (len == 0 && !ft_strlen2(*store)))
 		{
 			free(*buffer);
 			if (*store)
@@ -72,7 +72,7 @@ int	get_current_line(int fd, char **store, char **buffer, int len)
 		}
 		else
 		{
-			*store = ft_strjoin(store, *buffer);
+			*store = ft_strjoin2(store, *buffer);
 			if (!*store)
 			{
 				free(*buffer);
@@ -87,17 +87,17 @@ int	set_current_line(char **store, char **buffer)
 {
 	int	len;
 
-	if (ft_strchr(*store, '\n') != NULL)
-		len = ft_strchr(*store, '\n') - *store + 1;
+	if (ft_strchr2(*store, '\n') != NULL)
+		len = ft_strchr2(*store, '\n') - *store + 1;
 	else
-		len = ft_strlen(*store);
-	*buffer = ft_calloc(len + 1, sizeof(char));
+		len = ft_strlen2(*store);
+	*buffer = ft_calloc2(len + 1, sizeof(char));
 	if (!*buffer)
 		return (0);
-	ft_memcpy(*buffer, *store, len);
-	if (ft_strchr(*store, '\n') != NULL)
+	ft_memcpy2(*buffer, *store, len);
+	if (ft_strchr2(*store, '\n') != NULL)
 	{
-		*store = ft_substr(store, ft_strlen(*buffer));
+		*store = ft_substr2(store, ft_strlen2(*buffer));
 		if (!*store)
 		{
 			free(*buffer);
@@ -127,7 +127,7 @@ char	*get_next_line(int fd)
 	free(buffer);
 	if (!set_current_line(store + fd, &buffer))
 		return (NULL);
-	if (!**store)
+	if (*store && !**store)
 	{
 		free(*store);
 		*store = NULL;

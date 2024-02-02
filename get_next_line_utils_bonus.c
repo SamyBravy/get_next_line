@@ -6,13 +6,13 @@
 /*   By: sdell-er <sdell-er@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 16:43:25 by sdell-er          #+#    #+#             */
-/*   Updated: 2023/11/23 13:06:49 by sdell-er         ###   ########.fr       */
+/*   Updated: 2024/01/19 18:13:06 by sdell-er         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line_bonus.h"
 
-int	ft_strlen(char *s)
+int	ft_strlen2(char *s)
 {
 	int	l;
 
@@ -24,7 +24,7 @@ int	ft_strlen(char *s)
 	return (l);
 }
 
-void	ft_bzero(void *s, int n)
+void	ft_bzero2(void *s, int n)
 {
 	int		i;
 	char	*arr;
@@ -38,7 +38,7 @@ void	ft_bzero(void *s, int n)
 	}
 }
 
-char	*ft_calloc(int nmemb, int size)
+char	*ft_calloc2(int nmemb, int size)
 {
 	void	*ptr;
 
@@ -47,19 +47,19 @@ char	*ft_calloc(int nmemb, int size)
 	ptr = malloc(nmemb * size);
 	if (!ptr)
 		return (NULL);
-	ft_bzero(ptr, nmemb * size);
+	ft_bzero2(ptr, nmemb * size);
 	return (ptr);
 }
 
-char	*ft_strjoin(char **s1, char *s2)
+char	*ft_strjoin2(char **s1, char *s2)
 {
 	int			i;
 	int			l2;
 	int			l1;
 	char		*new;
 
-	l1 = ft_strlen(*s1);
-	l2 = ft_strlen(s2);
+	l1 = ft_strlen2(*s1);
+	l2 = ft_strlen2(s2);
 	new = malloc (sizeof(char) * (l1 + l2 + 1));
 	if (!new)
 	{
@@ -79,7 +79,7 @@ char	*ft_strjoin(char **s1, char *s2)
 	return (new);
 }
 
-char	*ft_strchr(char *s, int c)
+char	*ft_strchr2(char *s, int c)
 {
 	if (!s)
 		return (NULL);
